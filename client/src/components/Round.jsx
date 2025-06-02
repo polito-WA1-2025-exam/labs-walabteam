@@ -36,6 +36,7 @@ function Round(props){
     const sorted_round = [...updated_round].sort((a, b) => a.index - b.index);
     setGameC(sorted_round);
   }
+  
   const decreaseFakeIndex = (card) => {
     const prev_pos = gameC.findIndex(c => c.id === card.id) - 1;
     const new_index = gameC[prev_pos].index - 0.4;
