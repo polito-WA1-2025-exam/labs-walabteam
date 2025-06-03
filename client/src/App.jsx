@@ -1,11 +1,12 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useEffect, useState } from "react";
 import './App.css';
 
 import DefaultLayout from "./components/DefaultLayout";
 import MainPage from "./components/MainPage";
 import GameComplete from "./components/GameComplete";
-
+import EndGame from "./components/EndGame";
 import { Routes, Route, Navigate } from "react-router";
 import { LoginForm } from "./components/AuthComponents";
 import NotFound from "./components/NotFound";
@@ -63,6 +64,7 @@ function App() {
       <Route element={<DefaultLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} /> } >
         <Route path="/" element={ <MainPage loggedIn={loggedIn}/> } />
         <Route path="/game" element={<GameComplete loggedIn={loggedIn}/> } />
+        <Route path="/endGame" element={<EndGame loggedIn={loggedIn}/> } />
 
         <Route path='/login' element={loggedIn ? <Navigate replace to='/' /> : <LoginForm handleLogin={handleLogin} />} />
         <Route path="*" element={ <NotFound /> } />

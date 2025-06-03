@@ -2,13 +2,6 @@ import { useActionState } from "react";
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { Link } from 'react-router';
 
-//REMINDER: WHAT IS RETURNED BY THIS FUNCTION WILL BE THE NEW VALUE OF STATE
-//the function associated to the state through useActionState is the function returning the
-//new value of state after the submit of the form. in this case, the submit call a function and 
-//as always in a form, update the value of state, that typically is used to manage error messages
-//the idea with the form is: 
-//1.the submitted data are used to update/communicate something to server/other components
-//2.we need to communicate if there were error through state and dispaly potential error messages
 function LoginForm(props) {
     
     //Reminder: formData are the data in the fields at the moment the function is called (at submit)

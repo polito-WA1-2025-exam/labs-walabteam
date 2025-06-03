@@ -2,21 +2,17 @@ import API from "../API/API.mjs";
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
+import { DisplayCardBasic, DisplayCardInteractive } from './DisplayCard';
 
 function GameComplete(props){
-
-  //based on the fact we are logged or not
-  //1.the condition ending the game changes
-  //2.the game must be saved or not
 
     //NB
     //DURING A GAME A CARD WILL HAVE NEW ATTRIBUTE isNew, obtained, round.
 
+    const navigate = useNavigate();
+
     const [game, setGame] = useState([]);
     const [round, setRound] = useState([]);
-    const [roundActive, setRoundActive] =  useState(false); //to manage visualization
-    
-    //const navigate = useNavigate();
 
     //initialize first 3 cards (we don't care what was the original order)
     useEffect(() => {
@@ -30,8 +26,6 @@ function GameComplete(props){
 
     const startRound = async () => {
       try {
-        setRoundActive(true);
-
         //select currently owned cards
         const obtainedCards = game.filter(c => c.obtained === true);
 
@@ -52,17 +46,15 @@ function GameComplete(props){
     }
 
     const endRound = async () => {
-      setRoundActive(false);
-
       //pick id newCard and ask for the real value
-      const id_to_guess = structuredClone(round).find(c => c.isNew)?.id;
+      const id_to_guess = round.find(c => c.isNew)?.id;
       const actual_index = await API.cardIndex(id_to_guess);   
 
       //order of id acutal
-      const order_actual = structuredClone(round).map(c => c.isNew ? { ...c, index: actual_index } : c)
+      const order_actual = round.map(c => c.isNew ? { ...c, index: actual_index } : c)
                            .sort((a, b) => a.index - b.index).map(c=>c.id);
       //order of id user
-      const order_user = structuredClone(round).map(c=>c.id);
+      const order_user = round.map(c=>c.id);
 
       //compare id
       let right = true;
@@ -85,104 +77,84 @@ function GameComplete(props){
       }   
       
       setGame(prevGame => [...prevGame, card].sort((a, b) => a.index - b.index));
-
-      //claen round
       setRound([]);
     }
 
-    const increaseFakeIndex = (card) => {
-    //prendo la carta successiva estraggo il suo punteggio e faccio update del fake punteggio della mia carta
-    //i'm sure that if i update next_card+0.4 i get a index greater than the card but less than the next
-    
-      setRound(prevGameC => {
-        const next_pos = prevGameC.findIndex(c => c.id === card.id) + 1;
-        const new_index = prevGameC[next_pos].index + 0.4;
-        const updated_r = prevGameC.map(c => c.id === card.id ? { ...c, index: new_index } : c ).sort((a, b) => a.index - b.index);
-        return updated_r;
+    //if the value of game change: check if the game is finished or not
+    useEffect(() => {
+      if(game.length > 3){
+        if(!props.loggedIn){
+          navigate('/endGame', { state: { game } });
         }
-      )
+        else{
+          const owned = game.filter(item => item.obtained).length
+          const lost = game.filter(item => !item.obtained).length
+          if(owned === 6 && lost < 3|| lost === 3){
+            navigate('/endGame', { state: { game } });
+          }
+
+      }  
     }
-    const decreaseFakeIndex = (card) => {
-    //prendo la carta successiva estraggo il suo punteggio e faccio update del fake punteggio della mia carta
-    //i'm sure that if i update next_card+0.4 i get a index greater than the card but less than the next
-    
-      setRound(prevGameC => {
-        const prev_pos = prevGameC.findIndex(c => c.id === card.id) - 1;
-        const new_index = prevGameC[prev_pos].index - 0.4;
-        const updated_r = prevGameC.map(c => c.id === card.id ? { ...c, index: new_index } : c ).sort((a, b) => a.index - b.index);
-        return updated_r;
-        }
-      )
+    }, [game]);
+
+    const updateIndex = (card, delta) => {
+    setRound(prevRound => {
+      const idx = prevRound.findIndex(c => c.id === card.id);
+      const neighborIndex = idx + delta;
+      if(neighborIndex < 0 || neighborIndex >= prevRound.length) 
+        return prevRound;
+      const new_index = prevRound[neighborIndex].index + (delta > 0 ? 0.4 : -0.4);
+      return prevRound.map(c => c.id === card.id ? { ...c, index: new_index } : c).sort((a, b) => a.index - b.index);
+      });
     }
+
+    const increaseFakeIndex = (card) => updateIndex(card, +1);
+    const decreaseFakeIndex = (card) => updateIndex(card, -1);
 
     return(
-        <>
-            <Container className="text-center mt-5">
-              {roundActive?
-              <>
-              <Row  className="mb-5">
-                    <Col as="h2">Select the position of your new card</Col>
-                </Row>
-                
-                <Row  className="mb-5">
-                    {round.map((c) => <DisplayCard key={c.id} card={c} inc={increaseFakeIndex} dec={decreaseFakeIndex}/>)}
-                </Row>
-                
-                <Row  className="mb-4">
-                    <Col>
-                    <Button onClick = {endRound}>Position choosen</Button>
-                    </Col>
-                </Row>
-              </>
-              :
-              <>
-              <Row  className="mb-5">
-                    <Col as="h2">Your current cards won/notWon</Col>
-                </Row>
-                
-                <Row  className="mb-5">
-                    {game.filter(c => c.obtained).map(c => ( <DisplayCard key={c.id} card={c} /> ))}
-                </Row>
-                
-                <Row  className="mb-4">
-                    <Col>
-                    <Button onClick = {startRound}>Ready for a new round</Button>
-                    </Col>
-                </Row>
-                </>
-
-              }
-                
-            </Container>
-        </>
+      <>
+      <Container className="text-center mt-5">
+      
+      {round.length > 0 ?
+      <>
+      <Row  className="mb-5">
+            <Col as="h2">Select the position of your new card</Col>
+        </Row>
         
-    );
+        <Row  className="mb-5">
+          {round.map((c) => c.isNew ? 
+                            ( <DisplayCardInteractive key={c.id} card={c} inc={increaseFakeIndex} dec={decreaseFakeIndex} />) 
+                            : 
+                            (<DisplayCardBasic key={c.id} card={c} /> ) )}
+        </Row>
+        
+        <Row  className="mb-4">
+            <Col>
+            <Button onClick = {endRound}>Position choosen</Button>
+            </Col>
+        </Row>
+      </>
+      :
+      <>
+      <Row  className="mb-5">
+            <Col as="h2">Round results, your current cards...</Col>
+        </Row>
+        
+        <Row  className="mb-5">
+            {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} card={c} /> ))}
+        </Row>
+        
+        <Row  className="mb-4">
+            <Col>
+            <Button onClick = {startRound}>Ready for next round</Button>
+            </Col>
+        </Row>
+        </>
+      }          
+    </Container>
+  </>
+  )
 
 }
-
-
-function DisplayCard(props) {
-  //I dont' display cards not obtained
-
-  return (
-    <Card style={{ width: '18rem' }}>
-      <Card.Img variant="top" src={props.card.image} />
-      <Card.Body>
-        {!props.card.isNew && <Card.Title>index: {props.card.index}, 
-          obtained: {props.card.obtained.toString()}, round: {props.card.round}</Card.Title>}        
-        <Card.Text>{props.card.situation}</Card.Text>
-        {props.card.isNew && 
-          <> 
-          <Button className="me-3" variant="outline-dark" onClick = {() => props.dec(props.card)}>
-            <i class="bi bi-arrow-left-circle-fill"></i>
-          </Button>
-          <Button className="me-3" variant="outline-dark" onClick = {() => props.inc(props.card)}>
-            <i class="bi bi-arrow-right-circle-fill"></i>
-          </Button> </>}
-      </Card.Body>
-    </Card>
-  );
-}
-
 
 export default GameComplete;

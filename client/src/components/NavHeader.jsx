@@ -19,7 +19,7 @@ function NavHeader(props) {
   return(
     <Navbar bg='primary' data-bs-theme='dark'>
       <Container fluid>
-      <Link to="/" className="navbar-brand">HeapOverrun</Link>
+      <Link to="/" className="navbar-brand">Stuff Happens</Link>
       <Button onClick={() => setDarkMode(oldMode => !oldMode)}>
         { darkMode ? <i className="bi bi-sun-fill" /> : <i className="bi bi-moon-fill" />}
       </Button>

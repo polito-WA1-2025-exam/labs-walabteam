@@ -160,13 +160,13 @@ export const listQuestions = () => {
   });
 }
 
-
+//EVENTUALMENTE AGGIUNGERE/ TOGLIERE CAMPII DB
 //FUNCTION NEEDED TO MANAGE USER LOGIN (it will be called in LocalStrategy not by a proper api)
 //nb, reminder on promise for db: we reject only when we have errors not controlled (connection, not working functions ecc.)
-export const getUser = (email, password) => {
+export const getUser = (username, password) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM user WHERE email = ?'; //first we check email only for security reasons
-    db.get(sql, [email], (err, row) => {
+    const sql = 'SELECT * FROM users WHERE username = ?'; //first we check email only for security reasons
+    db.get(sql, [username], (err, row) => {
       if (err) { 
         reject(err); 
       }
@@ -175,8 +175,8 @@ export const getUser = (email, password) => {
         resolve(false); //remember: resolve because it's not a problem of the db
       }
       else {
-        //if the user is found we check the password
-        const user = {id: row.id, username: row.email, name: row.name};
+        //if the user is found we check the password eventualemnete 
+        const user = {id: row.id, username: row.username};
         
         //crypto.scrypt receives password, salt, length of hash and a function that manage the 
         //hashed password obtained and the case of err
