@@ -6,7 +6,9 @@ import { BrowserRouter } from "react-router";
 
 //OCCHIO ABBIAMO RIMOSSO STRICT MODE SARA' DA REINSERIRE
 createRoot(document.getElementById('root')).render(
+  <StrictMode>
     <BrowserRouter>
       <App />
-    </BrowserRouter>,
+    </BrowserRouter>
+  </StrictMode>,
 )

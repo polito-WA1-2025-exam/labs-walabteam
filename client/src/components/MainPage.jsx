@@ -1,7 +1,8 @@
 import { Link } from "react-router";
 import { Row, Col, Container } from "react-bootstrap";
 
-function MainPage() {
+function MainPage(props) {
+
 
   return (
     <Container className="text-center mt-5">
@@ -16,7 +17,11 @@ function MainPage() {
 
       <Row className="mb-4">
         <Col>
-          <Link to='/game' className='btn btn-primary btn-lg px-4 py-2'>Start mock game</Link>
+        {props.loggedIn ?
+          <Link to='/game' className='btn btn-primary btn-lg px-4 py-2'>Start Game</Link>
+        :
+          <Link to='/game' className='btn btn-primary btn-lg px-4 py-2'>Start Mock Game</Link>
+        }
         </Col>
       </Row>
 
