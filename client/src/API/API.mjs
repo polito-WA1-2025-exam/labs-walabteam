@@ -35,9 +35,27 @@ const cardIndex = async (cardId) => {
 }
 
 
+//save game
+const saveGame = async (userId, game, outcome_g) => {
+  const response = await fetch(`${SERVER_URL}/api/games`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      outcome: outcome_g,
+      rounds: game, 
+    }),
+  });
 
-
-
+  if (response.ok) {
+    return true;
+  } else {
+    const err = await response.json();
+    throw new Error(err.error || 'Error in saving game.');
+  }
+};
 
 
 //not of interest: 
@@ -170,5 +188,5 @@ const logOut = async() => {
     return null;
 }
 
-const API = { randomCard, firstCards, cardIndex, getAnswers, getQuestions, voteUp, addAnswer, updateAnswer, logIn, getUserInfo, logOut };
+const API = { randomCard, firstCards, cardIndex, saveGame, getAnswers, getQuestions, voteUp, addAnswer, updateAnswer, logIn, getUserInfo, logOut };
 export default API;

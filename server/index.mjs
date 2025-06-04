@@ -136,6 +136,34 @@ app.get('/api/cardIndex/:id', async (req, res) => {
   }
 });
 
+//add api to retrieve card info
+
+//
+/*URL: `/api/cardIndex/<id>`
+HTTP Method: POST.
+Description: Upload info on game
+Response: `200 OK` (success) or `500 Internal Server Error` (generic error). 
+Request body:
+
+Response body: 
+*/
+
+//RICONTROLLARE ( da validare )
+app.post('/api/games', isLoggedIn, async (req, res) => {
+  const { outcome, rounds } = req.body;
+  const userId =  req.user.id;
+
+  try {
+    const gameId = await createGame(userId, outcome);
+    await addRoundsToGame(gameId, rounds);
+
+    res.status(201).location(`/api/games/${gameId}`).end();
+  } catch (e) {
+    console.error(`ERROR: ${e.message}`);
+    res.status(503).json({ error: 'Impossible to create the game and rounds.' });
+  }
+});
+
 //TO REVIEW:
 
 //to protect apis (we can also write a isAdmin or something else)

@@ -54,6 +54,42 @@ export const card_index = (id) => {
   });
 }
 
+//retrieve card given id
+
+//save game info
+export const createGame = (userId, outcome) => {
+  return new Promise((resolve, reject) => {
+    const sql = `INSERT INTO users_history(user_id, outcome) VALUES (?, ?, ?)`;
+
+    db.run(sql, [userId, outcome], function (err) {
+      if (err) return reject(err);
+      resolve(this.lastID);
+    });
+  });
+};
+
+export const addRoundsToGame = (gameId, rounds) => {
+  return new Promise((resolve, reject) => {
+    if (!Array.isArray(rounds) || rounds.length === 0) {
+      return resolve(); 
+    }
+
+    const sql = `INSERT INTO round(game_id, round, card_id, outcome) VALUES (?, ?, ?, ?)`;
+
+    const insertions = rounds.map(r => {
+      return new Promise((res, rej) => {
+        db.run(sql, [gameId, r.round, r.card_id, r.outcome], (err) => {
+          if (err) rej(err);
+          else res();
+        });
+      });
+    });
+
+    Promise.all(insertions)
+      .then(resolve)
+      .catch(reject);
+  });
+};
 
 
 

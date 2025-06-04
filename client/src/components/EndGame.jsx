@@ -12,23 +12,27 @@ function EndGame(props){
     const game = location.state?.game;
 
     //history + is logged (win/not win change on logged)
-    /*save game on db
-    useEffect(() => {
-    }, []);*/
-
-    //if(props.loggedIn){  
-
-    let win = false;
+    //save game on db
+    //RICONTROLLARE
+       let win = false;
     const owned = game.filter(item => item.obtained).length;
 
-    if(props.loggedIn){
+    useEffect(() => {
+        const saveGame = async () => {
+        if(props.loggedIn){
         if(owned === 6)
             win = true;
-    }
-    else{
-        if(owned === 4)
-            win = true;
-    }
+        await API.saveGame(props.user.id, game, win);
+        }
+        else{
+            if(owned === 4)
+                win = true;
+        }
+        }
+        saveGame();
+
+    }, []);
+
 
     return(
         <>

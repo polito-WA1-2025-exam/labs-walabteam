@@ -64,7 +64,7 @@ function App() {
       <Route element={<DefaultLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} /> } >
         <Route path="/" element={ <MainPage loggedIn={loggedIn}/> } />
         <Route path="/game" element={<GameComplete loggedIn={loggedIn}/> } />
-        <Route path="/endGame" element={<EndGame loggedIn={loggedIn}/> } />
+        <Route path="/endGame" element={<EndGame loggedIn={loggedIn} user={user}/> } />
 
         <Route path='/login' element={loggedIn ? <Navigate replace to='/' /> : <LoginForm handleLogin={handleLogin} />} />
         <Route path="*" element={ <NotFound /> } />
