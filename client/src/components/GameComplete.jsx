@@ -101,7 +101,7 @@ function GameComplete(props){
       }
 
       //add the new card to the game
-      const card = structuredClone(round).find(c => c.id ===id_to_guess);
+      const card = round.find(c => c.id ===id_to_guess);
       card.isNew = false;  
       card.index = actual_index;
       if(right){
@@ -165,7 +165,7 @@ function GameComplete(props){
           {round.map((c) => c.isNew ? 
                             ( <DisplayCardInteractive key={c.id} card={c} inc={increaseFakeIndex} dec={decreaseFakeIndex} />) 
                             : 
-                            (<DisplayCardBasic key={c.id} card={c} /> ) )}
+                            (<DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ) )}
         </Row>
         
         <Row className="mb-2">
@@ -185,7 +185,7 @@ function GameComplete(props){
         </Row>
         
         <Row  className="mb-5">
-            {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} card={c} /> ))}
+            {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ))}
         </Row>
         
         <Row  className="mb-4">

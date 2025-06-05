@@ -1,13 +1,14 @@
 import { Card, Button } from "react-bootstrap";
 
+//check check
 function DisplayCardBasic(props) {
 
   return (
     <Card style={{ width: '18rem' }}>
-      <Card.Img variant="top" src={props.card.image} />
+      <Card.Img variant="top" src={props.image} />
       <Card.Body>
-        <Card.Title>index: {props.card.index}</Card.Title>       
-        <Card.Text>{props.card.situation}</Card.Text>
+        <Card.Title>index: {props.index}</Card.Title>       
+        <Card.Text>{props.situation}</Card.Text>
       </Card.Body>
     </Card>
   );
@@ -35,20 +36,4 @@ function DisplayCardInteractive(props) {
   );
 }
 
-function DisplayCardHistory(props) {
-
-  return (
-    <Card style={{ width: '18rem' }}>
-      <Card.Img variant="top" src={props.card.image} />
-      <Card.Body>
-        <Card.Title> index: {props.card.index}, 
-          obtained: {props.card.obtained.toString()}, 
-          round: {props.card.round}
-        </Card.Title>       
-        <Card.Text>{props.card.situation}</Card.Text>
-      </Card.Body>
-    </Card>
-  );
-}
-
-export { DisplayCardBasic, DisplayCardInteractive, DisplayCardHistory };
+export { DisplayCardBasic, DisplayCardInteractive};

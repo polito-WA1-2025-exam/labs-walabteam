@@ -38,7 +38,7 @@ function EndGame(props){
             </Row>
                 
             <Row  className="mb-5">
-                {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} card={c} /> ))}
+                {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ))}
             </Row>
                 
             <Row  className="mb-4">

@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import { check, validationResult } from 'express-validator';
 
-import { getUser, first_cards, random_card_no_index, card_index, games_of } from './dao.mjs';
+import { getUser, first_cards, random_card_no_index, card_index, games_of, info_game} from './dao.mjs';
 import { createGame, addRoundsToGame } from './dao.mjs';
 import cors from 'cors';
 
@@ -179,6 +179,25 @@ app.get('/api/gameHistory', isLoggedIn, async (req, res) => {
   try {
     const userId = req.user.id; 
     const i = await games_of(userId);
+
+    if (i.error) {
+      res.status(404).json(i);
+    } 
+    else {
+      res.json(i);
+    }
+  } 
+  catch (err) {
+    console.error(err);
+    res.status(500).end();
+  }
+});
+
+app.get('/api/gameDetail/:id_g', isLoggedIn, async (req, res) => {
+  try {
+
+    const gameId = req.params.id_g;
+    const i = await info_game(gameId);
 
     if (i.error) {
       res.status(404).json(i);

@@ -42,9 +42,9 @@ function GameHistory(props){
 function DisplayGame(props) {
   const navigate = useNavigate();
 
-  /*const handleDetailsClick = () => {
-    navigate(`/game/${props.id}`);
-  };*/
+  const handleDetailsClick = () => {
+    navigate(`/gameDetails/${props.id}`);
+  };
 
   return (
     <Col md={4} className="mb-4">
@@ -52,10 +52,9 @@ function DisplayGame(props) {
         <Card.Body>
           <Card.Title>Game on {dayjs(props.date).format('DD/MM/YYYY HH:mm')}</Card.Title>
           <Card.Text>Result: {props.result === 1 ? 'Win' : 'Loss'}</Card.Text>
-         {/* <Button variant="primary" onClick={handleDetailsClick}>
+          <Button variant="primary" onClick={handleDetailsClick}>
             See details
           </Button>
-          */}
         </Card.Body>
       </Card>
     </Col>

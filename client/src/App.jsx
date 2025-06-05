@@ -8,6 +8,7 @@ import MainPage from "./components/MainPage";
 import GameComplete from "./components/GameComplete";
 import EndGame from "./components/EndGame";
 import GameHistory from "./components/GameHistory";
+import GameDetails from "./components/GameDetails";
 import { Routes, Route, Navigate } from "react-router";
 import { LoginForm } from "./components/AuthComponents";
 import NotFound from "./components/NotFound";
@@ -58,6 +59,7 @@ function App() {
         <Route path="/game" element={<GameComplete loggedIn={loggedIn}/> } />
         <Route path="/endGame" element={<EndGame loggedIn={loggedIn} /> } />
         <Route path="/userHistory" element={<GameHistory loggedIn={loggedIn} /> } />
+        <Route path="/gameDetails/:g_id" element={<GameDetails loggedIn={loggedIn} /> } />
         <Route path='/login' element={loggedIn ? <Navigate replace to='/' /> : <LoginForm handleLogin={handleLogin} />} />
         <Route path="*" element={ <NotFound /> } />
       </Route>

@@ -94,7 +94,9 @@ export const addRoundsToGame = (gameId, rounds) => {
 //retrieve games of a user (first we have a page only with the list of games, their date and outcome)
 export const games_of = (user_id) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM users_history WHERE user_id = ?;`;
+    const sql = `SELECT * FROM users_history WHERE user_id = ?;
+    
+    `;
 
     db.all(sql, [user_id], (err, rows) => {
       if (err)
@@ -108,23 +110,23 @@ export const games_of = (user_id) => {
 }
 
 //then, clicking on game details we have to access to the list of rounds and information on single cards 
-
-//retrieve card given id (we can join?)
-export const card = (id) => {
+export const info_game = (g_id) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM cards WHERE id = ?;`;
-    db.get(sql, [id], (err, row) => {
+    const sql = `SELECT gd.round, gd.outcome, c.situation, c.image, c.bad_luck_index
+                 FROM game_details gd, cards c
+                 WHERE gd.game_id = ? AND gd.card_id = c.id
+                 ORDER BY round;`;
+    db.all(sql, [g_id], (err, rows) => {
       if (err)
         reject(err);
       else {
-        const card = new Card(row.id, row.situation, row.image, row.index);
-        resolve(card);
+        const games = rows.map((r) => ({"round": r.round, "result": r.outcome, 
+          "situation": r.situation, "image": r.image, "bad_luck_index": r.bad_luck_index}));
+        resolve(games);
       }
     });
   });
 }
-
-
 
 //EVENTUALMENTE AGGIUNGERE/ TOGLIERE CAMPII DB
 //FUNCTION NEEDED TO MANAGE USER LOGIN (it will be called in LocalStrategy not by a proper api)

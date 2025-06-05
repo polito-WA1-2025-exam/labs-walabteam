@@ -70,6 +70,18 @@ const userHistory = async () => {
   }
 };
 
+const gameDetails = async (g_id) => {
+  const response = await fetch(`${SERVER_URL}/api/gameDetail/${g_id}`, {
+    credentials: 'include',  
+  });
+  if (response.ok) {
+    const rounds = await response.json();
+    return rounds;
+  } else {
+    throw new Error("Ops, there is an error on the server.");
+  }
+};
+
 //api to ask for a user
 const logIn = async (credentials) => {
   const response = await fetch(SERVER_URL + '/api/sessions', {
@@ -112,5 +124,5 @@ const logOut = async() => {
     return null;
 }
 
-const API = { randomCard, firstCards, cardIndex, userHistory, saveGame, logIn, getUserInfo, logOut };
+const API = { randomCard, firstCards, cardIndex, userHistory, saveGame, gameDetails, logIn, getUserInfo, logOut };
 export default API;
