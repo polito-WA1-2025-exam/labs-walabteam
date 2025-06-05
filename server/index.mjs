@@ -1,8 +1,9 @@
 import express from 'express';
 import morgan from 'morgan';
-import {check, validationResult} from 'express-validator';
-import {listQuestions, getQuestion, listAnswersOf, addAnswer, updateAnswer, voteAnswer, getUser} from './dao.mjs';
-import {first_cards, random_card_no_index, card_index} from './dao.mjs';
+import { check, validationResult } from 'express-validator';
+
+import { getUser, first_cards, random_card_no_index, card_index, games_of } from './dao.mjs';
+import { createGame, addRoundsToGame } from './dao.mjs';
 import cors from 'cors';
 
 import passport from 'passport';
@@ -25,7 +26,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-//to review:
 passport.use(new LocalStrategy(async function verify(username, password, cb) {//we need to write the verify func the strategy uses
   const user = await getUser(username, password);
   if(!user)
@@ -40,6 +40,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+
 app.use(passport.authenticate('session')); //we define that session is used to authenticate
 
 //we define information we want to store in the session
@@ -50,8 +51,16 @@ passport.deserializeUser(function (user, cb) {
   return cb(null, user); //in all http request we can access this fields through req.user
 });
 
-
-
+//to protect apis (we can also write a isAdmin or something else)
+//ATTENTION: THE CHECK WITH THIS FUNCTION IS ONLY SERVER SIDE
+//WE HAVE TO BLOCK USER POSSIBLE ACTIONS ALSO 'VISUALLY' FOR EXAMPLE MAKING SOME PAGES UNACCESSIBLE
+//(and still we have to manage the server error arised when a non allowed user try to do something)
+const isLoggedIn = (req, res, next) => {//next is to call the next middleware or the route
+  if(req.isAuthenticated()) {
+    return next();
+  }
+  return res.status(401).json({error: 'Not authorized'});
+}
 
 //OKKKKKKKKKKKKKKKKKK
  /*
@@ -150,68 +159,41 @@ Response body:
 
 //RICONTROLLARE ( da validare )
 app.post('/api/games', isLoggedIn, async (req, res) => {
-  const { outcome, rounds } = req.body;
+  const outcome = req.body.outcome;
+  const date = req.body.date;
+  const rounds = req.body.rounds;
   const userId =  req.user.id;
 
   try {
-    const gameId = await createGame(userId, outcome);
+    const gameId = await createGame(userId, outcome, date);
     await addRoundsToGame(gameId, rounds);
 
-    res.status(201).location(`/api/games/${gameId}`).end();
+    res.status(201).end();
   } catch (e) {
     console.error(`ERROR: ${e.message}`);
-    res.status(503).json({ error: 'Impossible to create the game and rounds.' });
+    res.status(503).json({ error: 'Impossible to create the game.' });
   }
 });
 
-//TO REVIEW:
-
-//to protect apis (we can also write a isAdmin or something else)
-//ATTENTION: THE CHECK WITH THIS FUNCTION IS ONLY SERVER SIDE
-//WE HAVE TO BLOCK USER POSSIBLE ACTIONS ALSO 'VISUALLY' FOR EXAMPLE MAKING SOME PAGES UNACCESSIBLE
-//(and still we have to manage the server error arised when a non allowed user try to do something)
-const isLoggedIn = (req, res, next) => {//next is to call the next middleware or the route
-  if(req.isAuthenticated()) {
-    return next();
-  }
-  return res.status(401).json({error: 'Not authorized'});
-}
-
-
-// GET /api/questions
-app.get('/api/questions', (req, res) => {
-  listQuestions()
-  .then(questions => res.json(questions))
-  .catch(() => res.status(500).end());
-});
-
-// GET /api/questions/<id>
-app.get('/api/questions/:id', async (request, response) => {
+app.get('/api/gameHistory', isLoggedIn, async (req, res) => {
   try {
-    const question = await getQuestion(request.params.id);
-    if(question.error) {
-      response.status(404).json(question);
-    } else {
-      response.json(question);
+    const userId = req.user.id; 
+    const i = await games_of(userId);
+
+    if (i.error) {
+      res.status(404).json(i);
+    } 
+    else {
+      res.json(i);
     }
-  }
-  catch {
-    response.status(500).end();
-  }
-});
-
-// GET /api/questions/<id>/answers
-app.get('/api/questions/:id/answers', async (req, res) => {
-  try {
-    const answers = await listAnswersOf(req.params.id);
-    res.json(answers);
-  } catch {
+  } 
+  catch (err) {
+    console.error(err);
     res.status(500).end();
   }
 });
 
-// POST /api/questions/<id>/answers
-app.post('/api/questions/:id/answers', isLoggedIn, [
+/*app.post('/api/questions/:id/answers', isLoggedIn, [
   check('text').notEmpty(),
   check('email').isEmail(),
   check('score').isNumeric(),
@@ -237,8 +219,9 @@ app.post('/api/questions/:id/answers', isLoggedIn, [
     res.status(503).json({error: 'Impossible to create the answer.'});
   }
 });
+*/
 
-// PUT /api/answers/<id>
+/*
 app.put('/api/answers/:id', isLoggedIn, [
   check('text').notEmpty(),
   check('email').isEmail(),
@@ -264,8 +247,9 @@ app.put('/api/answers/:id', isLoggedIn, [
     res.status(503).json({'error': `Impossible to update answer #${req.params.id}.`});
   }
 });
+*/
 
-// POST /api/answers/<id>/vote
+/*
 app.post('/api/answers/:id/vote', isLoggedIn, [
   check('vote').notEmpty()
 ], async (req, res) => {
@@ -286,12 +270,13 @@ app.post('/api/answers/:id/vote', isLoggedIn, [
     res.status(503).json({error: e.message});
   }
 });
+*/
 
 // POST /api/sessions 
 //api for login, called if authentication is successfull
 //(check if request contains username and password fields)
 app.post('/api/sessions', passport.authenticate('local'), function(req, res) {
-  return res.status(201).json(req.user); //the response body depends on request body
+  return res.status(201).json(req.user); 
 });
 
 //check if there is an open session

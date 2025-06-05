@@ -24,7 +24,11 @@ function NavHeader(props) {
         { darkMode ? <i className="bi bi-sun-fill" /> : <i className="bi bi-moon-fill" />}
       </Button>
       {props.loggedIn ? 
-        <LogoutButton logout={props.handleLogout} /> :
+        <>
+          <LogoutButton logout={props.handleLogout} /> 
+          <Link to='/userHistory'className='btn btn-outline-light'>Games history</Link>
+        </>
+        :
         <Link to='/login'className='btn btn-outline-light'>Login</Link>
       }
       </Container>

@@ -54,14 +54,12 @@ export const card_index = (id) => {
   });
 }
 
-//retrieve card given id
-
 //save game info
-export const createGame = (userId, outcome) => {
+export const createGame = (userId, outcome, start_date) => {
   return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO users_history(user_id, outcome) VALUES (?, ?, ?)`;
+    const sql = `INSERT INTO users_history(user_id, outcome, start_date) VALUES (?, ?, ?)`;
 
-    db.run(sql, [userId, outcome], function (err) {
+    db.run(sql, [userId, outcome, start_date], function (err) {
       if (err) return reject(err);
       resolve(this.lastID);
     });
@@ -70,15 +68,15 @@ export const createGame = (userId, outcome) => {
 
 export const addRoundsToGame = (gameId, rounds) => {
   return new Promise((resolve, reject) => {
-    if (!Array.isArray(rounds) || rounds.length === 0) {
+    /*if (!Array.isArray(rounds) || rounds.length === 0) {
       return resolve(); 
-    }
+    }*/
 
-    const sql = `INSERT INTO round(game_id, round, card_id, outcome) VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO game_details(game_id, round, card_id, outcome) VALUES (?, ?, ?, ?)`;
 
     const insertions = rounds.map(r => {
       return new Promise((res, rej) => {
-        db.run(sql, [gameId, r.round, r.card_id, r.outcome], (err) => {
+        db.run(sql, [gameId, r.round, r.id, r.obtained], (err) => {
           if (err) rej(err);
           else res();
         });
@@ -92,116 +90,48 @@ export const addRoundsToGame = (gameId, rounds) => {
 };
 
 
-
-
-
-
-
-
-// get a question given its id
-export const getQuestion = (id) => {
-  return new Promise ((resolve, reject) => {
-    const sql = 'SELECT question.*, user.email FROM question JOIN user ON question.authorId = user.id WHERE question.id = ?';
-    db.get(sql, [id], (err, row) => {
-      if (err) {
-        reject(err);
-      } else if (row === undefined) {
-        resolve({error: "Question not available, check the inserted id."});
-      } else {
-        resolve(new Question(row.id, row.text, row.email, row.authorId, row.date));
-      }
-    });
-  });
-}
-
-// add a new question
-export const addQuestion = (question) => {
+//to manage display of history
+//retrieve games of a user (first we have a page only with the list of games, their date and outcome)
+export const games_of = (user_id) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO question(text, authorId, date) VALUES (?,?,?)';
-    db.run(sql, [question.text, question.userId, question.date], function(err) {
-      if (err)
-        reject(err);
-      else 
-        resolve(this.lastID);
-    });
-  });
-}
+    const sql = `SELECT * FROM users_history WHERE user_id = ?;`;
 
-// get all the answer of a given question
-export const listAnswersOf = (questionId) => {
-  return new Promise ((resolve, reject) => {
-    const sql = 'SELECT answer.*, user.email FROM answer JOIN user ON answer.authorId = user.id WHERE answer.questionId = ?';
-    db.all(sql, [questionId], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        const answers = rows.map((ans) => new Answer(ans.id, ans.text, ans.email, ans.authorId, ans.date, ans.score));
-        resolve(answers);
-      }
-    });
-  });
-}
-
-// add a new answer
-export const addAnswer = (answer, questionId) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO answer(text, authorId, date, score, questionId) VALUES (?, ?, ?, ?, ?)';
-    db.run(sql, [answer.text, answer.userId, answer.date, answer.score, questionId], function (err) {
-      if (err)
-        reject(err);
-      else
-        resolve(this.lastID);
-    });
-  });
-}
-
-// update an existing answer
-export const updateAnswer = (answer) => {
-  return new Promise((resolve, reject) => {
-    let sql = "UPDATE answer SET text = ?, authorId = ?, date = ?, score = ? WHERE id = ?"
-    db.run(sql, [answer.text, answer.userId, answer.date, answer.score, answer.id], function (err) {
-      if (err)
-        reject(err);
-      else
-        resolve(this.lastID);
-    });
-  });
-}
-
-// vote for an answer
-export const voteAnswer = (answerId, vote) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'UPDATE answer SET score = score + ? WHERE id= ?';
-    const delta = vote === 'up' ? 1 : -1;
-    db.run(sql, [delta, answerId], function(err) {
-      if (err)
-        reject(err);
-      else
-        resolve(this.changes);
-    });
-  });
-}
-// get all the questions
-export const listQuestions = () => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT question.*, user.email FROM question JOIN user ON question.authorId = user.id';
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [user_id], (err, rows) => {
       if (err)
         reject(err);
       else {
-        const questions = rows.map((q) => new Question(q.id, q.text, q.email, q.authorId, q.date));
-        resolve(questions);
+        const games = rows.map((g) => ({"g_id": g.game_id, "g_result": g.outcome, "g_date": g.start_date}));
+        resolve(games);
       }
     });
   });
 }
+
+//then, clicking on game details we have to access to the list of rounds and information on single cards 
+
+//retrieve card given id (we can join?)
+export const card = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM cards WHERE id = ?;`;
+    db.get(sql, [id], (err, row) => {
+      if (err)
+        reject(err);
+      else {
+        const card = new Card(row.id, row.situation, row.image, row.index);
+        resolve(card);
+      }
+    });
+  });
+}
+
+
 
 //EVENTUALMENTE AGGIUNGERE/ TOGLIERE CAMPII DB
 //FUNCTION NEEDED TO MANAGE USER LOGIN (it will be called in LocalStrategy not by a proper api)
 //nb, reminder on promise for db: we reject only when we have errors not controlled (connection, not working functions ecc.)
 export const getUser = (username, password) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM users WHERE username = ?'; //first we check email only for security reasons
+    const sql = 'SELECT * FROM users WHERE username = ?'; //first we check username only for security reasons
     db.get(sql, [username], (err, row) => {
       if (err) { 
         reject(err); 

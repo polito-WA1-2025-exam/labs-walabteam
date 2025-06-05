@@ -1,11 +1,11 @@
 import API from "../API/API.mjs";
+import dayjs from 'dayjs';
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { DisplayCardBasic, DisplayCardInteractive } from './DisplayCard';
 
 function GameComplete(props){
-
     //NB
     //DURING A GAME A CARD WILL HAVE NEW ATTRIBUTE isNew, obtained, round.
 
@@ -14,8 +14,19 @@ function GameComplete(props){
     const [game, setGame] = useState([]);
     const [round, setRound] = useState([]);
 
+    //start of the game 
+    const [startTime, setStartTime] = useState(null);
+
+    //timer
+    const [timer, setTimer] = useState(30);   
+    const [timerActive, setTimerActive] = useState(false); 
+
     //initialize first 3 cards (we don't care what was the original order)
     useEffect(() => {
+        //game started
+        const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+        setStartTime(now);
+
         const getInitialCards = async () => {
         const cards = await API.firstCards();
         const sorted = cards.map(c => ({ ...c, obtained: true, round: 0})).sort((a, b) => a.index - b.index);
@@ -24,8 +35,29 @@ function GameComplete(props){
         getInitialCards();
     }, []);
 
+    //to check
+    useEffect(() => {
+      let countdown;
+      if (timerActive && timer > 0) {
+        countdown = setInterval(() => {
+          setTimer((prev) => prev - 1);
+        }, 1000);
+      } 
+      else if (timer === 0 && timerActive) {
+        clearInterval(countdown);
+        setTimerActive(false);
+        endRound(); 
+      }
+      return () => clearInterval(countdown); 
+    }, [timer, timerActive]);
+
     const startRound = async () => {
       try {
+        //timer
+        // Avvia il countdown
+        setTimer(30);
+        setTimerActive(true);
+
         //select currently owned cards
         const obtainedCards = game.filter(c => c.obtained === true);
 
@@ -46,6 +78,9 @@ function GameComplete(props){
     }
 
     const endRound = async () => {
+      //timer
+      setTimerActive(false);
+
       //pick id newCard and ask for the real value
       const id_to_guess = round.find(c => c.isNew)?.id;
       const actual_index = await API.cardIndex(id_to_guess);   
@@ -89,7 +124,12 @@ function GameComplete(props){
         else{
           const owned = game.filter(item => item.obtained).length
           const lost = game.filter(item => !item.obtained).length
+          let win = false;
           if(owned === 6 && lost < 3|| lost === 3){
+            if(owned === 6)
+              win = true;
+            const outcomeInt = win ? 1 : 0;
+            API.saveGame(outcomeInt, startTime, game);
             navigate('/endGame', { state: { game } });
           }
 
@@ -128,6 +168,10 @@ function GameComplete(props){
                             (<DisplayCardBasic key={c.id} card={c} /> ) )}
         </Row>
         
+        <Row className="mb-2">
+          <Col as="h5">⏳ Time left: {timer}s</Col>
+        </Row>
+
         <Row  className="mb-4">
             <Col>
             <Button onClick = {endRound}>Position choosen</Button>

@@ -7,6 +7,7 @@ import DefaultLayout from "./components/DefaultLayout";
 import MainPage from "./components/MainPage";
 import GameComplete from "./components/GameComplete";
 import EndGame from "./components/EndGame";
+import GameHistory from "./components/GameHistory";
 import { Routes, Route, Navigate } from "react-router";
 import { LoginForm } from "./components/AuthComponents";
 import NotFound from "./components/NotFound";
@@ -50,22 +51,13 @@ function App() {
     setMessage('');
   };
 
-  //for now let's define here our states (tanto devono essere riannulati tornando qui)
-
-  //if the user isn't logged-in edit and add pages can't be reached
-  //if the user is logged-in login-page can't be reached
-
-
-  //the idea is the following we have a game
-  //and we manage the playing moment to a moment in which i change my states and my situaton
-  //and the default game route that shows your current situation (so you won/lost the game, your cards )
   return (
     <Routes>
       <Route element={<DefaultLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} /> } >
         <Route path="/" element={ <MainPage loggedIn={loggedIn}/> } />
         <Route path="/game" element={<GameComplete loggedIn={loggedIn}/> } />
-        <Route path="/endGame" element={<EndGame loggedIn={loggedIn} user={user}/> } />
-
+        <Route path="/endGame" element={<EndGame loggedIn={loggedIn} /> } />
+        <Route path="/userHistory" element={<GameHistory loggedIn={loggedIn} /> } />
         <Route path='/login' element={loggedIn ? <Navigate replace to='/' /> : <LoginForm handleLogin={handleLogin} />} />
         <Route path="*" element={ <NotFound /> } />
       </Route>
