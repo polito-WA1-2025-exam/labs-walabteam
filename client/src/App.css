@@ -1,18 +1,105 @@
-/* Full-height layout with sticky footer */
+:root {
+  --primary-color: #7e5bef;
+  --secondary-color: #b983ff;
+  --light-bg: #cdc4d7; /* Lilla chiaro */
+  --light-text: #3a3a6a;
+  --dark-bg: #121220;
+  --dark-card: #1f1f33;
+  --dark-text: #e2dfff;
+  --muted-text: #999;
+
+  --light-footer-bg: #1f1f33;  /* Uguale al dark-card */
+  --light-footer-text: #e2dfff; /* Uguale al dark-text */
+}
+
+/* ---------- Layout base ---------- */
 .page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--light-bg);
+  color: var(--light-text);
 }
 
-/* Makes main content grow and fill space */
 .page-content {
   flex: 1;
+  padding-bottom: 2rem;
 }
 
-/* Footer styling */
+/* ---------- Footer ---------- */
 .footer-style {
-  background-color: #eef1ff;
-  color: #4a4a8a;
+  background-color: var(--light-footer-bg);
+  color: var(--light-footer-text);
   font-weight: 500;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background-color: var(--primary-color) !important;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: white !important;
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #6847e2;
+  border-color: #6847e2;
+}
+
+/* ---------- Cards, Game area ---------- */
+.card,
+.game-card {
+  background-color: white;
+  color: var(--light-text);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.card:hover,
+.game-card:hover {
+  transform: scale(1.02);
+}
+
+/* ---------- Dark mode ---------- */
+[data-bs-theme="dark"] .page-wrapper {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+[data-bs-theme="dark"] .footer-style {
+  background-color: var(--dark-card);
+  color: var(--muted-text);
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .game-card {
+  background-color: var(--dark-card);
+  color: var(--dark-text);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .btn-primary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+[data-bs-theme="dark"] .btn-primary:hover {
+  background-color: #9f72f0;
+  border-color: #9f72f0;
+}
+
+[data-bs-theme="dark"] .navbar-brand {
+  color: var(--dark-text) !important;
 }

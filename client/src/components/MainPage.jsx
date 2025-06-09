@@ -8,7 +8,7 @@ function MainPage(props) {
     <Container className="text-center mt-5">
       <Row className="mb-4">
         <Col>
-          <h1 className="fw-bold text-primary">🃏 Welcome to Stuff Happens Game 🃏</h1>
+          <h1 className="fw-bold text-[#1f1f33] dark:text-[#e0e0f0]">🃏 Welcome to Stuff Happens Game 🃏</h1>
           <p className="text-muted fs-5">
             Draw a card and discover how unlucky your day really is!
           </p>

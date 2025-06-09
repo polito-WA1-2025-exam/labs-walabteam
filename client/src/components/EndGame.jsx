@@ -37,7 +37,7 @@ function EndGame(props){
                     
             </Row>
                 
-            <Row  className="mb-5">
+            <Row  className="mb-5 justify-content-center">
                 {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ))}
             </Row>
                 

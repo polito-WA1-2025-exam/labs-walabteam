@@ -15,22 +15,28 @@ import NotFound from "./components/NotFound";
 import API from "./API/API.mjs";
 
 function App() {
-  //states to manage login: they are 'global', potentially needed by all componentsnpm
+  //states to manage login: they are 'global', potentially needed by all components
   const [loggedIn, setLoggedIn] = useState(false);
   const [message, setMessage] = useState('');
   const [user, setUser] = useState('');
 
   //called only the first time we open the app to check if a session is still open on the server, if so, 
   //it updates the user and loggedIn states (allows the user to stay logged in even after refreshing/closing the page)
-  useEffect(() => {
-    const checkAuth = async () => {
-      const user = await API.getUserInfo(); // we have the user info here
-      setLoggedIn(true);
-      setUser(user);
-    };
-    checkAuth();
-  }, []);
 
+  useEffect(() => {
+    try{
+      const checkAuth = async () => {
+        const user = await API.getUserInfo(); // we have the user info here
+        setLoggedIn(true);
+        setUser(user);
+      };
+      checkAuth();
+  }
+    catch{
+      setLoggedIn(false);         
+      setUser('');   
+    }
+  }, []);
 
   //we write here handleLogin/logout because we don't just call the api, but we also manage stateVariable that have to be 'global'
   const handleLogin = async (credentials) => {

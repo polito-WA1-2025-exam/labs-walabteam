@@ -1,19 +1,22 @@
 import sqlite from 'sqlite3';
 import { Card } from './models.mjs';
-import crypto from 'crypto'; //used to compare passwords
+import crypto from 'crypto'; 
 
 //open db
 const db = new sqlite.Database('db_StuffHappens.sqlite', (err) => {
   if (err) throw err;
 });
 
-//pick 3 cards (first round)
+//pick initial 3 cards
 export const first_cards = () => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM cards ORDER BY RANDOM() LIMIT 3;';
     db.all(sql, [], (err, rows) => {
       if (err)
         reject(err);
+      else if (!rows || rows.length === 0) {
+        reject(new Error("No cards in the db."));
+      }
       else {
         const cards = rows.map((c) => new Card(c.id, c.situation, c.image, c.bad_luck_index));
         resolve(cards);
@@ -22,7 +25,7 @@ export const first_cards = () => {
   });
 }
 
-//pick a card given some already picked cards (fake index given, initialized at 0)
+//pick a card given some already picked cards (set a fake index, 0)
 export const random_card_no_index = (excludedCards) => {
   return new Promise((resolve, reject) => {
     const placeholders = excludedCards.map(() => '?').join(',');
@@ -31,6 +34,9 @@ export const random_card_no_index = (excludedCards) => {
     db.get(sql, excludedCards, (err, row) => {
       if (err)
         reject(err);
+      else if (!row) {
+        reject(new Error("No cards avialable."));
+      }
       else {
         const card = new Card(row.id, row.situation, row.image, 0);
         resolve(card);
@@ -47,6 +53,9 @@ export const card_index = (id) => {
     db.get(sql, [id], (err, row) => {
       if (err)
         reject(err);
+      else if (!row) {
+        reject(new Error(`Card with id: ${id} not found.`));
+      }
       else {
         resolve(row.bad_luck_index);
       }
@@ -54,9 +63,13 @@ export const card_index = (id) => {
   });
 }
 
-//save game info
+//save general game info
 export const createGame = (userId, outcome, start_date) => {
   return new Promise((resolve, reject) => {
+     if (!userId || !outcome || !start_date) {
+      return reject(new Error("Empty parameters."));
+    }
+
     const sql = `INSERT INTO users_history(user_id, outcome, start_date) VALUES (?, ?, ?)`;
 
     db.run(sql, [userId, outcome, start_date], function (err) {
@@ -66,11 +79,12 @@ export const createGame = (userId, outcome, start_date) => {
   });
 };
 
+//save detailed rounds info
 export const addRoundsToGame = (gameId, rounds) => {
   return new Promise((resolve, reject) => {
-    /*if (!Array.isArray(rounds) || rounds.length === 0) {
-      return resolve(); 
-    }*/
+    if (!Array.isArray(rounds) || rounds.length === 0) {
+      return reject(new Error("Rounds is empty or not valid."));
+    }
 
     const sql = `INSERT INTO game_details(game_id, round, card_id, outcome) VALUES (?, ?, ?, ?)`;
 
@@ -89,14 +103,12 @@ export const addRoundsToGame = (gameId, rounds) => {
   });
 };
 
-
-//to manage display of history
-//retrieve games of a user (first we have a page only with the list of games, their date and outcome)
+//retrieve games of a user
 export const games_of = (user_id) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM users_history WHERE user_id = ?;
-    
-    `;
+    if (!user_id) return reject(new Error("User id not valid."));
+
+    const sql = `SELECT * FROM users_history WHERE user_id = ?;`;
 
     db.all(sql, [user_id], (err, rows) => {
       if (err)
@@ -109,9 +121,11 @@ export const games_of = (user_id) => {
   });
 }
 
-//then, clicking on game details we have to access to the list of rounds and information on single cards 
+//retrieve detailed info on a game 
 export const info_game = (g_id) => {
   return new Promise((resolve, reject) => {
+    if (!g_id) return reject(new Error("Game id not valid."));
+
     const sql = `SELECT gd.round, gd.outcome, c.situation, c.image, c.bad_luck_index
                  FROM game_details gd, cards c
                  WHERE gd.game_id = ? AND gd.card_id = c.id
@@ -128,34 +142,29 @@ export const info_game = (g_id) => {
   });
 }
 
-//EVENTUALMENTE AGGIUNGERE/ TOGLIERE CAMPII DB
-//FUNCTION NEEDED TO MANAGE USER LOGIN (it will be called in LocalStrategy not by a proper api)
-//nb, reminder on promise for db: we reject only when we have errors not controlled (connection, not working functions ecc.)
+//retrive user given username and password
 export const getUser = (username, password) => {
   return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM users WHERE username = ?'; //first we check username only for security reasons
+    if (!username || !password) return reject(new Error("Username or password not received."));
+
+    const sql = 'SELECT * FROM users WHERE username = ?'; 
     db.get(sql, [username], (err, row) => {
       if (err) { 
         reject(err); 
       }
-      //if no db connection error, i check if the user exists or not
-      else if (row === undefined) { //if the email doesn't exist
-        resolve(false); //remember: resolve because it's not a problem of the db
+      else if (row === undefined) { 
+        resolve(false); 
       }
       else {
-        //if the user is found we check the password eventualemnete 
         const user = {id: row.id, username: row.username};
-        
-        //crypto.scrypt receives password, salt, length of hash and a function that manage the 
-        //hashed password obtained and the case of err
-        //(similar logic to db.get receiving the sql and a function managing the result of the sql or the err) 
+
         crypto.scrypt(password, row.salt, 16, function(err, hashedPassword) {
-          if (err) reject(err); //error not really controlled by us (related to the function)
-          //if no error we can compare the two password
+          if (err) reject(err);
+
           if(!crypto.timingSafeEqual(Buffer.from(row.password, 'hex'), hashedPassword))
             resolve(false);
           else
-            resolve(user); //if the user exist with that password I return it's information
+            resolve(user);
         });
       }
     });

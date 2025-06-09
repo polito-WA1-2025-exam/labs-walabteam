@@ -43,7 +43,8 @@ function DisplayGame(props) {
   const navigate = useNavigate();
 
   const handleDetailsClick = () => {
-    navigate(`/gameDetails/${props.id}`);
+    navigate(`/gameDetails/${props.id}`, { state: { date: props.date}
+    });
   };
 
   return (
