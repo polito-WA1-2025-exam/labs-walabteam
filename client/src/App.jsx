@@ -43,7 +43,7 @@ function App() {
     try {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
-      setMessage({msg: `Welcome, ${user.name}!`, type: 'success'});
+      setMessage({msg: `Welcome, ${user.username}!`, type: 'success'});
       setUser(user);
     }
     catch(err) {

@@ -1,31 +1,5 @@
 import { Card, Button } from "react-bootstrap";
 
-//per aggiungere immagine:
-/*
-<img
-        src={props.image}
-        alt="card"
-        style={{
-          width: '100%',
-          height: 'auto',
-          borderRadius: '0.5rem',
-          boxShadow: '0 0 8px rgba(0,0,0,0.2)',
-        }}
-      />
-
-<img
-        src={props.card.image}
-        alt="card"
-        style={{
-          width: '100%',
-          height: 'auto',
-          borderRadius: '0.5rem',
-          boxShadow: '0 0 8px rgba(0,0,0,0.2)',
-        }}
-      />
-*/
-
-
 function DisplayCardBasic(props) {
   return (
     <div style={{
@@ -36,7 +10,7 @@ function DisplayCardBasic(props) {
       alignItems: 'center',
     }}>
       <div style={{
-        backgroundColor: '#a370f7',
+        backgroundColor: '#1f1f33',
         color: 'white',
         padding: '0.3rem 0.6rem',
         borderRadius: '0.4rem',
@@ -47,11 +21,35 @@ function DisplayCardBasic(props) {
         {props.index}
       </div>
 
+      <div
+        style={{
+          width: '9rem',
+          height: '12rem',         
+          backgroundColor: 'white',
+          border: '4px solid #1f1f33', 
+          borderRadius: '0.4rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src={`/cards/${props.image}`}
+          alt={props.situation}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
+      </div>
 
-      {/*aggiungere immagine*/}
 
       <div style={{
-        backgroundColor: '#a370f7',
+        backgroundColor: '#1f1f33',
+        width: '9rem',
         color: 'white',
         padding: '0.4rem',
         borderRadius: '0.4rem',
@@ -80,7 +78,7 @@ function DisplayCardInteractive(props) {
     }}>
 
       <div style={{
-        backgroundColor: '#a370f7',
+        backgroundColor: '#1f1f33',
         color: 'white',
         padding: '0.3rem 0.6rem',
         borderRadius: '0.4rem',
@@ -91,11 +89,33 @@ function DisplayCardInteractive(props) {
         ?
       </div>
 
-{/*aggiungere immagine*/}
-      
+      <div
+        style={{
+          width: '9rem',
+          height: '12rem',         
+          backgroundColor: 'white',
+          border: '4px solid #1f1f33', 
+          borderRadius: '0.4rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src={`/cards/${props.card.image}`}
+          alt={props.card.situation}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
+      </div>      
 
       <div style={{
-        backgroundColor: '#a370f7',
+        backgroundColor: '#1f1f33',
         color: 'white',
         padding: '0.4rem',
         borderRadius: '0.4rem',

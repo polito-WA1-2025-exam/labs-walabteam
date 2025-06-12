@@ -102,8 +102,7 @@ app.get('/api/cardIndex/:id', [check('id').notEmpty().withMessage('Invalid card 
 
 //check outcome probably not a string
 app.post('/api/games', isLoggedIn, 
-  [check('outcome').isString().notEmpty(), check('date').isDate({ format: 'YYYY-MM-DD', strictMode: true }),
-  check('rounds').isArray().notEmpty().withMessage('Rounds must be a non-empty array')], async (req, res) => {
+  [check('rounds').notEmpty()], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
     return res.status(422).json({ errors: errors.array() });

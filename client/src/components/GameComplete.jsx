@@ -134,67 +134,6 @@ function GameComplete(props){
       }  
     }
     }, [game]);
-
-    const updateIndex = (card, delta) => {
-    setRound(prevRound => {
-      const idx = prevRound.findIndex(c => c.id === card.id);
-      const neighborIndex = idx + delta;
-      if(neighborIndex < 0 || neighborIndex >= prevRound.length) 
-        return prevRound;
-      const new_index = prevRound[neighborIndex].index + (delta > 0 ? 0.4 : -0.4);
-      return prevRound.map(c => c.id === card.id ? { ...c, index: new_index } : c).sort((a, b) => a.index - b.index);
-      });
-    }
-
-    const increaseFakeIndex = (card) => updateIndex(card, +1);
-    const decreaseFakeIndex = (card) => updateIndex(card, -1);
-
-    return(
-      <>
-      <Container className="text-center mt-5">
-      
-      {round.length > 0 ?
-      <>
-        
-        <Row  className="mb-5">
-          {round.map((c, idx, arr) => c.isNew ? 
-                            ( <DisplayCardInteractive key={c.id} card={c} inc={increaseFakeIndex} dec={decreaseFakeIndex} 
-                               disableLeft={idx === 0} disableRight={idx === arr.length - 1}/>) 
-                            : 
-                            (<DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ) )}
-        </Row>
-        
-        <Row className="mb-2">
-          <Col as="h5">⏳ Time left: {timer}s</Col>
-        </Row>
-
-        <Row  className="mb-4">
-            <Col>
-            <Button onClick = {endRound}>Position choosen</Button>
-            </Col>
-        </Row>
-      </>
-      :
-      <>
-      <Row  className="mb-5">
-            <Col as="h2">Round results, your current cards...</Col>
-        </Row>
-        
-        <Row  className="mb-5">
-            {game.filter(c => c.obtained).map(c => ( <DisplayCardBasic key={c.id} image={c.image} index={c.index} situation={c.situation} /> ))}
-        </Row>
-        
-        <Row  className="mb-4">
-            <Col>
-            <Button onClick = {startRound}>Ready for next round</Button>
-            </Col>
-        </Row>
-        </>
-      }          
-    </Container>
-  </>
-  )
-
 }
 
 export default GameComplete;

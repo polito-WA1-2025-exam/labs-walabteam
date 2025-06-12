@@ -66,7 +66,7 @@ export const card_index = (id) => {
 //save general game info
 export const createGame = (userId, outcome, start_date) => {
   return new Promise((resolve, reject) => {
-     if (!userId || !outcome || !start_date) {
+    if (!userId || !start_date) {
       return reject(new Error("Empty parameters."));
     }
 
