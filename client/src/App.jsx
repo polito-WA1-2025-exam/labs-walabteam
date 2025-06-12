@@ -15,7 +15,7 @@ import NotFound from "./components/NotFound";
 import API from "./API/API.mjs";
 
 function App() {
-  //states to manage login: they are 'global', potentially needed by all components
+  //states to manage login status
   const [loggedIn, setLoggedIn] = useState(false);
   const [message, setMessage] = useState('');
   const [user, setUser] = useState('');

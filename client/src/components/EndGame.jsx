@@ -11,9 +11,6 @@ function EndGame(props){
     const location = useLocation();
     const game = location.state?.game;
 
-    //history + is logged (win/not win change on logged)
-    //save game on db
-    //RICONTROLLARE
     let win = false;
     const owned = game.filter(item => item.obtained).length;
 
@@ -31,9 +28,9 @@ function EndGame(props){
         <Container className="text-center mt-5">
             <Row  className="mb-5">
                 {win?
-                <Col as="h2">You Won!</Col>
+                <Col as="h1">You Won!</Col>
                 :
-                <Col as="h2">Oh no you lost!</Col>}
+                <Col as="h1">Oh no you lost!</Col>}
                     
             </Row>
                 

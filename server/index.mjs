@@ -100,7 +100,6 @@ app.get('/api/cardIndex/:id', [check('id').notEmpty().withMessage('Invalid card 
   }
 });
 
-//check outcome probably not a string
 app.post('/api/games', isLoggedIn, 
   [check('rounds').notEmpty()], async (req, res) => {
   const errors = validationResult(req);

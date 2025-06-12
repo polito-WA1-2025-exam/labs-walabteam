@@ -11,7 +11,7 @@ function GameHistory(props){
 
     const {loggedIn, user} = props;
 
-    const [games, setGames] = useState([]);
+    const [games, setGames] = useState([]);    
 
     useEffect(() => {
         const getGames = async () => {
@@ -27,7 +27,7 @@ function GameHistory(props){
       <Container className="text-center mt-5">
       
       <Row  className="mb-5">
-            <Col as="h2">Your past games</Col>
+        <h1 className="text-[#1f1f33] dark:text-[#e0e0f0]">Your past games</h1>
       </Row>
         
         <Row  className="mb-5">

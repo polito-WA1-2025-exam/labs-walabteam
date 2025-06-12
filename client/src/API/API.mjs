@@ -48,8 +48,6 @@ const cardIndex = async (cardId) => {
   }
 }
 
-
-//save game
 const saveGame = async (outcome_g, date, rounds) => {
   try{
     const response = await fetch(`${SERVER_URL}/api/games`, {
@@ -76,7 +74,6 @@ const saveGame = async (outcome_g, date, rounds) => {
   }
 };
 
-//user history 
 const userHistory = async () => {
   try{
     const response = await fetch(SERVER_URL + "/api/gameHistory", {
@@ -111,7 +108,6 @@ const gameDetails = async (g_id) => {
   }
 };
 
-//api to ask for a user
 const logIn = async (credentials) => {
   const response = await fetch(SERVER_URL + '/api/sessions', {
     method: 'POST',
@@ -131,8 +127,6 @@ const logIn = async (credentials) => {
   }
 };
 
-
-//to manage open session (the app is closed and reopend and the session, so the login, is still valid)
 const getUserInfo = async () => {
   try {
     const response = await fetch(SERVER_URL + '/api/sessions/current', {
@@ -184,7 +178,6 @@ const logOut = async () => {
     throw new Error("Network error: " + error.message);
   }
 };
-
 
 const API = { randomCard, firstCards, cardIndex, userHistory, saveGame, gameDetails, logIn, getUserInfo, logOut };
 export default API;
