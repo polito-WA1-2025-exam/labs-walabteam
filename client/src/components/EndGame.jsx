@@ -1,6 +1,4 @@
-import API from "../API/API.mjs";
-import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useLocation} from "react-router";
 import { DisplayCardBasic} from './DisplayCard';
 
